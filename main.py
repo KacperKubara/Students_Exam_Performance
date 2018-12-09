@@ -42,3 +42,9 @@ female_mean = dataset_female[["math score", "reading score", "writing score"]].m
 mean_scores_by_gender = pd.concat([male_mean, female_mean], axis = 1, names = ["test", "lol"])
 mean_scores_by_gender.columns = ["Male Mean", "Female Mean"] 
 display(mean_scores_by_gender)
+
+# Results based on parental level of education
+print(dataset["parental level of education"].unique())
+dataset["parental level of education"] = dataset["parental level of education"].map(lambda x: "high school" if x == "some high school" else x)
+dataset["parental level of education"] = dataset["parental level of education"].map(lambda x: "college" if x == "some college" else x)
+# ToDo: mean table for above, maybe juxtapose is with the gender?
