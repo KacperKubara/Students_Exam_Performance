@@ -3,6 +3,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from IPython.display import display
+sns.set()
 # Read the data
 dataset = pd.read_csv("StudentsPerformance.csv")
 
@@ -44,7 +45,33 @@ mean_scores_by_gender.columns = ["Male Mean", "Female Mean"]
 display(mean_scores_by_gender)
 
 # Results based on parental level of education
-print(dataset["parental level of education"].unique())
+display(dataset["parental level of education"].unique())
 dataset["parental level of education"] = dataset["parental level of education"].map(lambda x: "high school" if x == "some high school" else x)
 dataset["parental level of education"] = dataset["parental level of education"].map(lambda x: "college" if x == "some college" else x)
-# ToDo: mean table for above, maybe juxtapose is with the gender?
+education_level_list = dataset["parental level of education"].unique()
+df_mean = pd.Series()
+fig2 , ax = plt.subplots(3, 1, figsize = [5, 15], sharex= True)
+
+# Create neat table for mean values
+for i, education_level in enumerate(education_level_list):
+    mean = dataset[dataset["parental level of education"] == education_level].mean()
+    mean = mean.rename(education_level)
+    df_mean = pd.concat([df_mean, mean], axis = 1, sort = False)
+
+df_mean = df_mean.drop(df_mean.columns[0], axis = 1)
+
+# Plot the exam score based on parental education
+ax[0] = sns.barplot(x = "parental level of education", y = "math score", 
+                    data = dataset, estimator = np.mean, ax = ax[0])
+ax[1] = sns.barplot(x = "parental level of education", y = "reading score", 
+                    data = dataset, estimator = np.mean, ax = ax[1])
+ax[2] = sns.barplot(x = "parental level of education", y = "writing score", 
+                    data = dataset, estimator = np.mean, ax = ax[2])
+for axes in ax:
+    axes.set_xlabel("")
+# Display the mean table
+display(df_mean)
+
+# Draw a heatmap with the numeric values in each cell
+fig4, ax9 = plt.subplots(figsize=(9, 6))
+sns.heatmap(df_mean, annot=True, fmt="d", linewidths=.1, ax=ax9)
