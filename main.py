@@ -50,7 +50,7 @@ dataset["parental level of education"] = dataset["parental level of education"].
 dataset["parental level of education"] = dataset["parental level of education"].map(lambda x: "college" if x == "some college" else x)
 education_level_list = dataset["parental level of education"].unique()
 df_mean = pd.Series()
-fig2 , ax = plt.subplots(3, 1, figsize = [5, 15], sharex= True)
+fig2 , ax = plt.subplots(3, 1, figsize = [10, 15], sharex= True)
 
 # Create neat table for mean values
 for i, education_level in enumerate(education_level_list):
@@ -67,11 +67,18 @@ ax[1] = sns.barplot(x = "parental level of education", y = "reading score",
                     data = dataset, estimator = np.mean, ax = ax[1])
 ax[2] = sns.barplot(x = "parental level of education", y = "writing score", 
                     data = dataset, estimator = np.mean, ax = ax[2])
-for axes in ax:
-    axes.set_xlabel("")
+
 # Display the mean table
 display(df_mean)
 
-# Draw a heatmap with the numeric values in each cell
-fig4, ax9 = plt.subplots(figsize=(9, 6))
-sns.heatmap(df_mean, annot=True, fmt="d", linewidths=.1, ax=ax9)
+# Display a heatmap with the numeric values in each cell
+fig4, ax9 = plt.subplots(figsize=(12, 5))
+sns.heatmap(df_mean,linewidths=.1, ax=ax9)
+
+# Results based on the lunch type
+dataset_lunch = dataset[["lunch", "math score", "reading score", "writing score"]].copy()
+dataset_lunch = dataset_lunch.groupby(by = ["lunch"]).mean()
+# Display the table and the heatmap
+display(dataset_lunch)
+fig5, ax10 = plt.subplots(figsize=(12, 5))
+sns.heatmap(dataset_lunch,linewidths=.1, ax=ax10)
