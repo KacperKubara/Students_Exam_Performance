@@ -82,3 +82,9 @@ dataset_lunch = dataset_lunch.groupby(by = ["lunch"]).mean()
 display(dataset_lunch)
 fig5, ax10 = plt.subplots(figsize=(12, 5))
 sns.heatmap(dataset_lunch,linewidths=.1, ax=ax10)
+
+# Results based on the preparation
+display(dataset["test preparation course"].unique())
+dataset_preparation = dataset[["test preparation course", "math score", "reading score", "writing score"]].copy()
+dataset_preparation = dataset_preparation.groupby(by = ["test preparation course"]).mean()
+display(dataset_preparation)
