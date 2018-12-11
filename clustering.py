@@ -31,45 +31,57 @@ Create classes for the exam scores
 """
 # Make an average score from 3 exams and label them as above
 average_score = dataset.iloc[:,-3:]
+x_num =  dataset.iloc[:,-3:]
 average_score = average_score.applymap(score_labels)
-
-
 x = average_score
-y = dataset.iloc[:,:-3]
+x_copy = x.copy()
 
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 hot_enc_x   = OneHotEncoder()
 label_enc_x = LabelEncoder()
-label_enc_y = LabelEncoder()
 
 x = x.apply(label_enc_x.fit_transform)
 x = hot_enc_x.fit_transform(x).toarray()
 
 #ToDo: PCA, K-means clustering 
-# PCA 
+"""# PCA 
 from sklearn.decomposition import PCA
 pca = PCA(n_components = 2)
 x = pca.fit_transform(x)
 explained_variance = pca.explained_variance_ratio_
+"""
 
 # Elbow Method here
-# Fitting K-Means to the dataset
 from sklearn.cluster import KMeans
-kmeans = KMeans(n_clusters = 8, init = 'k-means++')
-y_kmeans = kmeans.fit_predict(x)
-# Visualising the clusters
-plt.scatter(x[y_kmeans == 0, 0], x[y_kmeans == 0, 1], s = 100, c = 'red', label = 'Cluster 1')
-plt.scatter(x[y_kmeans == 1, 0], x[y_kmeans == 1, 1], s = 100, c = 'blue', label = 'Cluster 2')
-plt.scatter(x[y_kmeans == 2, 0], x[y_kmeans == 2, 1], s = 100, c = 'green', label = 'Cluster 3')
-plt.scatter(x[y_kmeans == 3, 0], x[y_kmeans == 3, 1], s = 100, c = 'cyan', label = 'Cluster 4')
-plt.scatter(x[y_kmeans == 4, 0], x[y_kmeans == 4, 1], s = 100, c = 'magenta', label = 'Cluster 5')
-plt.scatter(x[y_kmeans == 5, 0], x[y_kmeans == 5, 1], s = 100, c = 'black', label = 'Cluster 6')
-plt.scatter(x[y_kmeans == 6, 0], x[y_kmeans == 6, 1], s = 100, c = 'orange', label = 'Cluster 7')
-plt.scatter(x[y_kmeans == 7, 0], x[y_kmeans == 7, 1], s = 100, c = 'brown', label = 'Cluster 8')
-
-plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s = 300, c = 'yellow', label = 'Centroids')
-plt.title('Clusters of customers')
-plt.xlabel('Var1')
-plt.ylabel('Var2')
-plt.legend()
+wcss = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters = i, init = 'k-means++', random_state = 42)
+    kmeans.fit(x)
+    wcss.append(kmeans.inertia_)
+plt.plot(range(1, 11), wcss)
+plt.title('The Elbow Method')
+plt.xlabel('Number of clusters')
+plt.ylabel('WCSS')
 plt.show()
+# n_clusters should be 5
+
+# Fitting K-Means to the dataset
+kmeans = KMeans(n_clusters = 5, init = 'k-means++')
+y_kmeans = kmeans.fit_predict(x)
+x_num["cluster"] = y_kmeans
+# Visualising the clusters
+from mpl_toolkits.mplot3d import axes3d
+fig6 = plt.figure()
+ax11 = fig6.add_subplot(111, projection='3d')
+
+ax11.scatter((x_num[x_num.cluster == 0])["math score"].values, (x_num[x_num.cluster == 0])["reading score"].values, (x_num[x_num.cluster == 0])["writing score"].values, s = 100, c = 'red', label = 'Cluster 1')
+ax11.scatter((x_num[x_num.cluster == 1])["math score"].values, (x_num[x_num.cluster == 1])["reading score"].values, (x_num[x_num.cluster == 1])["writing score"].values, s = 100, c = 'blue', label = 'Cluster 2')
+ax11.scatter((x_num[x_num.cluster == 2])["math score"].values, (x_num[x_num.cluster == 2])["reading score"].values, (x_num[x_num.cluster == 2])["writing score"].values, s = 100, c = 'green', label = 'Cluster 3')
+ax11.scatter((x_num[x_num.cluster == 3])["math score"].values, (x_num[x_num.cluster == 3])["reading score"].values, (x_num[x_num.cluster == 3])["writing score"].values, s = 100, c = 'cyan', label = 'Cluster 4')
+ax11.scatter((x_num[x_num.cluster == 4])["math score"].values, (x_num[x_num.cluster == 4])["reading score"].values, (x_num[x_num.cluster == 4])["writing score"].values, s = 100, c = 'magenta', label = 'Cluster 5')
+
+ax11.set_title('Clusters of customers')
+ax11.set_xlabel('Math')
+ax11.set_ylabel('Reading')
+ax11.set_zlabel('Writing')
+ax11.legend()
