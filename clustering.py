@@ -30,34 +30,46 @@ Create classes for the exam scores
 85%-100% - very high
 """
 # Make an average score from 3 exams and label them as above
-average_score = (dataset["math score"] + dataset["reading score"]
-                 + dataset["writing score"])/3
-dataset_average = dataset.drop(labels = ["writing score", "math score", "reading score"],
-                       axis = 1)
-dataset_average["average score"] = average_score
-dataset_average["average score"] = dataset_average["average score"].map(score_labels)
+average_score = dataset.iloc[:,-3:]
+average_score = average_score.applymap(score_labels)
 
-"""
-X_train = dataset_average.iloc[:, :-1].values
-from sklearn.decomposition import PCA
-pca = PCA(n_components = 2)
-X_train = pca.fit_transform(X_train)
-explained_variance = pca.explained_variance_ratio_
-"""
-x = dataset_average.iloc[:, :-1]
-# x = np.transpose(x)
-y = dataset_average.iloc[:,-1]
+
+x = average_score
+y = dataset.iloc[:,:-3]
 
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 hot_enc_x   = OneHotEncoder()
-hot_enc_y   = OneHotEncoder(categorical_features = [0])
 label_enc_x = LabelEncoder()
 label_enc_y = LabelEncoder()
 
 x = x.apply(label_enc_x.fit_transform)
-y = label_enc_y.fit_transform(y)
-
 x = hot_enc_x.fit_transform(x).toarray()
-y = hot_enc_y.fit_transform(y.reshape(-1, 1)).toarray()
 
-#ToDo: PCA, K-means clustering analysis
+#ToDo: PCA, K-means clustering 
+# PCA 
+from sklearn.decomposition import PCA
+pca = PCA(n_components = 2)
+x = pca.fit_transform(x)
+explained_variance = pca.explained_variance_ratio_
+
+# Elbow Method here
+# Fitting K-Means to the dataset
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters = 8, init = 'k-means++')
+y_kmeans = kmeans.fit_predict(x)
+# Visualising the clusters
+plt.scatter(x[y_kmeans == 0, 0], x[y_kmeans == 0, 1], s = 100, c = 'red', label = 'Cluster 1')
+plt.scatter(x[y_kmeans == 1, 0], x[y_kmeans == 1, 1], s = 100, c = 'blue', label = 'Cluster 2')
+plt.scatter(x[y_kmeans == 2, 0], x[y_kmeans == 2, 1], s = 100, c = 'green', label = 'Cluster 3')
+plt.scatter(x[y_kmeans == 3, 0], x[y_kmeans == 3, 1], s = 100, c = 'cyan', label = 'Cluster 4')
+plt.scatter(x[y_kmeans == 4, 0], x[y_kmeans == 4, 1], s = 100, c = 'magenta', label = 'Cluster 5')
+plt.scatter(x[y_kmeans == 5, 0], x[y_kmeans == 5, 1], s = 100, c = 'black', label = 'Cluster 6')
+plt.scatter(x[y_kmeans == 6, 0], x[y_kmeans == 6, 1], s = 100, c = 'orange', label = 'Cluster 7')
+plt.scatter(x[y_kmeans == 7, 0], x[y_kmeans == 7, 1], s = 100, c = 'brown', label = 'Cluster 8')
+
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s = 300, c = 'yellow', label = 'Centroids')
+plt.title('Clusters of customers')
+plt.xlabel('Var1')
+plt.ylabel('Var2')
+plt.legend()
+plt.show()
